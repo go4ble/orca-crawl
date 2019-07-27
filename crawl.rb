@@ -9,6 +9,8 @@ DATE_FMT = '%m/%d/%Y %I:%M %p'
 class Crawl
   include Capybara::DSL
 
+  attr_reader :balance
+
   def initialize(username:, password:, card_number:, station:)
     @username    = username
     @password    = password
@@ -33,6 +35,16 @@ class Crawl
     click_on(id: 'head-login')
   end
 
+  def goto_card
+    table = all('table', class: 'data').first
+    json = Jsoner.parse(table['outerHTML'])
+    card_row = JSON.parse(json).find { |row| @card_number == row['Card Number'].strip }
+    raise 'could not find card' if card_row.nil?
+    @balance = card_row['E-purse Balance'].strip
+    click_on(text: @card_number)
+    click_on(text: 'Transaction history')
+  end
+
   def read_table_to_json(table)
     json = Jsoner.parse(table['outerHTML'])
     JSON.parse(json).map { |row| row.transform_keys(&:strip).transform_values(&:strip) }
@@ -49,8 +61,7 @@ class Crawl
 
   def fetch_morning_bordings_this_month
     login
-    click_on(text: @card_number)
-    click_on(text: 'Transaction history')
+    balance = goto_card
     results = []
     loop do
       table = find('table', id: 'resultTable')
@@ -81,4 +92,5 @@ if __FILE__ == $0
   puts "#{count} boarding#{count == 1 ? '' : 's'} this month."
   days_remaining = Date.today.business_days_until(Date.today.next_month.beginning_of_month)
   puts "#{days_remaining} day#{days_remaining == 1 ? '' : 's'} remaining."
+  puts "#{c.balance}"
 end
