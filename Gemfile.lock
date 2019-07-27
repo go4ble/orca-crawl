@@ -31,6 +31,7 @@ GEM
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     minitest (5.11.3)
+    mqtt (0.5.0)
     nokogiri (1.10.3)
       mini_portile2 (~> 2.4.0)
     poltergeist (1.18.1)
@@ -67,6 +68,7 @@ DEPENDENCIES
   business_time!
   capybara!
   jsoner!
+  mqtt!
   poltergeist!
   pry!
   rb-readline!

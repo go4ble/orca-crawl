@@ -6,6 +6,7 @@ source "https://rubygems.org" do
   gem 'selenium-webdriver'
   gem 'jsoner'
   gem 'business_time'
+  gem 'mqtt'
 
   gem 'pry'
   gem 'rb-readline'  # support pry

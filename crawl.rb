@@ -2,7 +2,7 @@ require 'business_time'
 require 'capybara/dsl'
 require 'capybara/poltergeist'
 require 'jsoner'
-require 'time'
+require 'mqtt'
 
 DATE_FMT = '%m/%d/%Y %I:%M %p'
 
@@ -93,4 +93,20 @@ if __FILE__ == $0
   days_remaining = Date.today.business_days_until(Date.today.next_month.beginning_of_month)
   puts "#{days_remaining} day#{days_remaining == 1 ? '' : 's'} remaining."
   puts "#{c.balance}"
+
+  mqtt_host = ENV['MQTT_HOST']
+  if mqtt_host
+    mqtt_topic = "orca_crawl/#{options[:card_number]}"
+    mqtt_payload = {
+      boardings:      count,
+      days_remaining: days_remaining,
+      balance:        c.balance,
+      checked_at:     Time.now.iso8601
+    }.to_json
+    puts "Publishing to MQTT topic: #{mqtt_topic}."
+    MQTT::Client.connect(mqtt_host) do |client|
+      # qos = 1, at least once
+      client.publish(mqtt_topic, mqtt_payload, retain = true, qos = 1)
+    end
+  end
 end
