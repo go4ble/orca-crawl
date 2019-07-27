@@ -1,3 +1,4 @@
+require 'business_time'
 require 'capybara/dsl'
 require 'capybara/poltergeist'
 require 'jsoner'
@@ -78,4 +79,6 @@ if __FILE__ == $0
   results = c.fetch_morning_bordings_this_month
   count = results.length
   puts "#{count} boarding#{count == 1 ? '' : 's'} this month."
+  days_remaining = Date.today.business_days_until(Date.today.next_month.beginning_of_month)
+  puts "#{days_remaining} day#{days_remaining == 1 ? '' : 's'} remaining."
 end
